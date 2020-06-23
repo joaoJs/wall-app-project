@@ -7,8 +7,6 @@ module.exports = app => {
   
     router.get("/", users.findAll);
   
-    router.get("/published", users.findAllPublished);
-  
     router.get("/:id", users.findOne);
   
     router.put("/:id", users.update);
@@ -18,4 +16,4 @@ module.exports = app => {
     router.delete("/", users.deleteAll);
   
     app.use('/api/users', router);
-  };
+};
