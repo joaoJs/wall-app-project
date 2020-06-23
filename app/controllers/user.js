@@ -11,7 +11,7 @@ exports.create = (req, res) => {
       }
     
       // Create a User
-      const User = {
+      const user = {
         name: req.body.name,
       };
     
