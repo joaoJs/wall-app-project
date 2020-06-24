@@ -1,8 +1,12 @@
 const db = require("../models");
 const User = db.users;
 const Op = db.Sequelize.Op;
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.create = (req, res) => {
+    console.log('inside method')
+    console.log(req.body)
     if (!req.body.name) {
         res.status(400).send({
           message: "Name can not be empty!"
@@ -13,11 +17,30 @@ exports.create = (req, res) => {
       // Create a User
       const user = {
         name: req.body.name,
+        email: req.body.email,
+        password: req.body.password
       };
+
+      const msg = {
+        to: 'j.campos4g@gmail.com',
+        from: 'j.campos4g@gmail.com',
+        subject: 'Welcome',
+        text: 'Welcome to the Wall!',
+        html: '<strong>Welcome to the Wall!</strong>',
+      };
+
+      sgMail.send(msg).then(() => {
+          console.log('Message sent')
+      }).catch((error) => {
+          console.log(error.response.body)
+          // console.log(error.response.body.errors[0].message)
+      })
     
       // Save User in the database
       User.create(user)
         .then(data => {
+          // console.log('SEEENT')
+          // sgMail.send(msg);
           res.send(data);
         })
         .catch(err => {
@@ -45,15 +68,16 @@ exports.findAll = (req, res) => {
 };
 
 exports.findOne = (req, res) => {
-    const id = req.params.id;
+    const userEmail = req.params.email;
 
-    User.findByPk(id)
+    User.findOne({where: {email: userEmail}})
       .then(data => {
+        console.log(data)
         res.send(data);
       })
       .catch(err => {
         res.status(500).send({
-          message: "Error retrieving User with id=" + id
+          message: "Error retrieving User with email=" + userEmail
         });
       });
 };
