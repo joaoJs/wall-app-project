@@ -1,8 +1,10 @@
-const db = require("../models");
+const db = require("../models")
+const decryptPassword = require('../utils/password')
 const User = db.users;
 const Op = db.Sequelize.Op;
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const sgMail = require('@sendgrid/mail')
+const jwt = require('jsonwebtoken');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 exports.create = (req, res) => {
     console.log('inside method')
@@ -14,11 +16,13 @@ exports.create = (req, res) => {
         return;
       }
     
+      const decryptedPass = decryptPassword(req.body.password, req.body.email)
+      console.log(decryptedPass)
       // Create a User
       const user = {
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password
+        password: decryptedPass
       };
 
       const msg = {
@@ -68,12 +72,19 @@ exports.findAll = (req, res) => {
 };
 
 exports.findOne = (req, res) => {
-    const userEmail = req.params.email;
-
+    const userEmail = req.body.email;
+    const decryptedPass = decryptPassword(req.body.password, req.body.email)
     User.findOne({where: {email: userEmail}})
-      .then(data => {
-        console.log(data)
-        res.send(data);
+      .then(user => {
+        // if login succeeds, we start a new session and user can post on the wall
+        if(user !== null) {
+          req.session.isLoggedIn = true
+          res.json({msg: 'ok'})
+        } else {
+          res.status(500).send({
+            message: "Error retrieving User with email=" + userEmail
+          });
+        }
       })
       .catch(err => {
         res.status(500).send({

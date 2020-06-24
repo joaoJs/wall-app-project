@@ -6,8 +6,10 @@ module.exports = app => {
     router.post("/", users.create);
   
     router.get("/", users.findAll);
+
+    router.get("/auth", users.findAll);
   
-    router.get("/:email", users.findOne);
+    router.post("/login", users.findOne);
   
     router.put("/:id", users.update);
   
