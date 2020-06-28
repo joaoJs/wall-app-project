@@ -4,7 +4,7 @@ const User = db.users;
 const Op = db.Sequelize.Op;
 const sgMail = require('@sendgrid/mail')
 const jwt = require('jsonwebtoken');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
 
 exports.create = (req, res) => {
     console.log('inside method')
@@ -26,7 +26,7 @@ exports.create = (req, res) => {
       };
 
       const msg = {
-        to: 'j.campos4g@gmail.com',
+        to: user.email,
         from: 'j.campos4g@gmail.com',
         subject: 'Welcome',
         text: 'Welcome to the Wall!',
